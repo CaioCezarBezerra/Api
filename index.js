@@ -2,32 +2,34 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const auth = require('./auth');
 const { checkAuthenticated } = require('./auth');
+const cors = require('cors');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+app.use(express.json());
 
 app.use(bodyParser.json());
+app.use(cors());
 
-
-app.post('/calculadora', checkAuthenticated, (req, res) => {
+app.post('/api/calculadora', checkAuthenticated, (req, res) => {
     const { valor1, valor2, operacao } = req.body;
 
     let resultado;
     switch (operacao) {
         case 'somar':
-            resultado = valor1 + valor2;
+            resultado = eval(`${valor1} + ${valor2}`);
             break;
         case 'subtrair':
-            resultado = valor1 - valor2;
+            resultado = eval(`${valor1} - ${valor2}`); 
             break;
         case 'multiplicar':
-            resultado = valor1 * valor2;
+            resultado = eval(`${valor1} * ${valor2}`);
             break;
         case 'dividir':
-            if (valor2 === 0) {
+            if (valor2 === "0") {
                 return res.status(400).json({ error: 'Divisão por zero não é permitida.' });
             }
-            resultado = valor1 / valor2;
+            resultado = eval(`${valor1} / ${valor2}`);
             break;
         default:
             return res.status(400).json({ error: 'Operação inválida.' });
@@ -36,7 +38,7 @@ app.post('/calculadora', checkAuthenticated, (req, res) => {
     res.json({ resultado });
 });
 
-app.post('/login', (req, res) => {
+app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
 
     
